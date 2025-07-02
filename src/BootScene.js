@@ -12,9 +12,9 @@ export default class BootScene extends Phaser.Scene {
         // this.createRectTexture('log', 100, 20, 0x8b4513); // replaced by PNG
         this.createRectTexture('oysterCage', 60, 40, 0x4b4b4b);
         this.createRectTexture('jetSki', 80, 30, 0xff0000);
-        this.createRectTexture('oyster', 20, 20, 0xffffff);
-        this.createRectTexture('fireworks', 25, 25, 0xffff00);
-        this.createRectTexture('sunglasses', 30, 15, 0x000000);
+        // this.createRectTexture('oyster', 20, 20, 0xffffff);
+        // this.createRectTexture('fireworks', 25, 25, 0xffff00);
+        // this.createRectTexture('sunglasses', 30, 15, 0x000000);
         // this.createRectTexture('kayaker', 60, 30, 0x00ffff); // disabled to allow kayaker.png to load
         // Placeholder for geese (disabled when PNG present)
         // this.createRectTexture('geese', 80, 40, 0xffffff);
@@ -32,6 +32,8 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('log', 'assets/images/log.png');
         this.load.image('geese', 'assets/images/geese.png');
         this.load.image('jetski', 'assets/images/jetski.png');
+        this.load.image('magic_oyster', 'assets/images/magic_oyster.png');
+        this.load.image('osprey_nest', 'assets/images/osprey_nest.png');
     }
 
     create() {
