@@ -12,7 +12,6 @@ const KAYAKER_SCALE = 0.4 ; // very small kayaker
 const OBSTACLE_SCALE = 1.0;
 const BASE_OBSTACLE_SPEED = 200; // starting speed in px/s
 const SPEED_GROWTH_PER_SEC = 5; // additional px/s per second elapsed
-const LOG_SCALE      = 1.0;   // <- new
 const CAGE_SCALE     = 0.5;   // oysterCage what is this
 const GEESE_SCALE = 1.0;
 const GEESE_HORIZONTAL_SPEED = 60;
@@ -21,6 +20,7 @@ const JETSKI_SPEED = 250;
 const INVINCIBILITY_DURATION = 5000; // ms of invulnerability granted by magic oyster
 const OSPREY_NEST_SCALE = 0.5; // scale for osprey nest pole obstacle5
 const WAKE_FREQ = 70;
+const BRANCH_SCALE = 1.0; // scale for branch obstacle
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -131,6 +131,18 @@ export default class GameScene extends Phaser.Scene {
         // Disable vertical movement – keep boat fixed on the Y axis
         this.player.setVelocityY(0);
 
+        /* ----- Boat tilt based on horizontal velocity ----- */
+        const velX = this.player.body.velocity.x;
+        let targetAngle = 0;
+        if (velX < -20) {
+            targetAngle = -8; // tilt left
+        } else if (velX > 20) {
+            targetAngle = 8;  // tilt right
+        }
+        // Smoothly interpolate current angle toward targetAngle
+        this.player.angle = Phaser.Math.Linear(this.player.angle, targetAngle, 0.15);
+        /* ----------------------------------------------- */
+
         // Destroy off-screen objects (after physics)
         this.obstacles.children.iterate((child) => {
             if (child && child.y > this.scale.height + 100) {
@@ -164,7 +176,7 @@ export default class GameScene extends Phaser.Scene {
 
     spawnObstacle() {
         // Weighted obstacle selection – kayaker appears ~20% of spawns
-        const nonKayaker = ['log', 'buoy', 'geese', 'jetski', 'osprey_nest'];
+        const nonKayaker = ['branch', 'buoy', 'geese', 'jetski', 'osprey_nest'];
         const key = Phaser.Math.FloatBetween(0, 1) < 0.2 ? 'kayaker' : Phaser.Utils.Array.GetRandom(nonKayaker);
         let xPos = Phaser.Math.Between(40, this.scale.width - 40);
         let yPos = -50;
@@ -221,26 +233,32 @@ export default class GameScene extends Phaser.Scene {
                 ease: 'Sine.easeInOut',
             });
         } else if (key === 'geese') {
+            // Match the kayaker pattern: spawn from left/right, horizontal drift, downward fall, and tilt bobbing
             const fromLeft = Phaser.Math.Between(0, 1) === 0;
             sprite.y = -50;
             sprite.x = fromLeft ? -50 : this.scale.width + 50;
-            sprite.setVelocityX(fromLeft ? GEESE_HORIZONTAL_SPEED : -GEESE_HORIZONTAL_SPEED);
+            sprite.setVelocityX(fromLeft ? 120 : -120); // same horizontal speed as kayaker
+            // vertical velocity remains from the default sprite.setVelocityY(curSpeed) call above
             sprite.setScale(GEESE_SCALE);
 
-            // Flip so geese look in travel direction (default faces left)
+            // Flip sprite so geese face travel direction (default faces left)
             if (fromLeft) {
                 sprite.setFlipX(true);
             } else {
                 sprite.setFlipX(false);
             }
 
+            // Update body size to match scaling
             sprite.body.setSize(sprite.displayWidth, sprite.displayHeight);
 
-            // Gentle vertical bobbing to mimic floating on water
+            // Subtle tilting (same as kayaker)
             this.tweens.add({
                 targets: sprite,
-                y: '+=4', // move down 4 px then back up
-                duration: Phaser.Math.Between(800, 1200),
+                angle: {
+                    from: -4,
+                    to: 4,
+                },
+                duration: Phaser.Math.Between(900, 1300),
                 yoyo: true,
                 repeat: -1,
                 ease: 'Sine.easeInOut',
@@ -290,15 +308,22 @@ export default class GameScene extends Phaser.Scene {
                 repeat: -1,
                 ease: 'Sine.easeInOut',
             });
-        } else if (key === 'log') {
-            sprite.setScale(LOG_SCALE);
-            sprite.body.setSize(sprite.displayWidth, sprite.displayHeight);
+        } else if (key === 'branch') {
+            // Same behavior as buoy but with branch sprite & scale
+            sprite.setScale(BRANCH_SCALE);
 
-            // Subtle vertical bobbing to mimic floating effect
+            // Body same size as sprite
+            sprite.body.setSize(sprite.displayWidth, sprite.displayHeight);
+            sprite.body.setOffset((sprite.displayWidth - sprite.body.width) / 2, (sprite.displayHeight - sprite.body.height) / 2);
+
+            // Gentle bobbing tilt like buoy
             this.tweens.add({
                 targets: sprite,
-                y: '+=6', // move down 6 px (will yoyo back up)
-                duration: Phaser.Math.Between(900, 1200),
+                angle: {
+                    from: -3,
+                    to: 3,
+                },
+                duration: Phaser.Math.Between(1000, 1400),
                 yoyo: true,
                 repeat: -1,
                 ease: 'Sine.easeInOut',
@@ -308,8 +333,8 @@ export default class GameScene extends Phaser.Scene {
             // No horizontal drift; just falls straight like default
             sprite.body.setSize(sprite.displayWidth, sprite.displayHeight);
         } else {
-            // Default obstacle types now only include logs; apply log scale if needed
-            sprite.setScale(LOG_SCALE);
+            // Generic fallback for any other obstacle types
+            sprite.setScale(OBSTACLE_SCALE);
             sprite.body.setSize(sprite.displayWidth, sprite.displayHeight);
         }
 

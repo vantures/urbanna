@@ -9,7 +9,7 @@ export default class BootScene extends Phaser.Scene {
     preload() {
         // Create placeholder textures via graphics.
         // this.createRectTexture('player', 40, 40, 0x00ff00); // removed to avoid key conflict; player will use PNG
-        // this.createRectTexture('log', 100, 20, 0x8b4513); // replaced by PNG
+        // this.createRectTexture('log2', 100, 20, 0x8b4513); // replaced by PNG
         this.createRectTexture('oysterCage', 60, 40, 0x4b4b4b);
         this.createRectTexture('jetSki', 80, 30, 0xff0000);
         // this.createRectTexture('oyster', 20, 20, 0xffffff);
@@ -18,6 +18,8 @@ export default class BootScene extends Phaser.Scene {
         // this.createRectTexture('kayaker', 60, 30, 0x00ffff); // disabled to allow kayaker.png to load
         // Placeholder for geese (disabled when PNG present)
         // this.createRectTexture('geese', 80, 40, 0xffffff);
+
+
 
         // Simple blue water tile for scrolling background
         this.createRectTexture('water', 64, 64, 0x1e90ff);
@@ -29,12 +31,13 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('player', 'assets/images/powerboat.png');
         this.load.image('buoy', 'assets/images/buoy.png');
         this.load.image('kayaker', 'assets/images/kayaker.png');
-        this.load.image('log', 'assets/images/log.png');
+        // Use existing log.png art for the new log2 obstacle until log2.png is available
         this.load.image('geese', 'assets/images/geese.png');
         this.load.image('jetski', 'assets/images/jetski.png');
         this.load.image('magic_oyster', 'assets/images/magic_oyster.png');
         this.load.image('osprey_nest', 'assets/images/osprey_nest.png');
         this.load.image('logo', 'assets/images/rivahracelogo.png');
+        this.load.image('branch', 'assets/images/branch.png');
 
         // Audio assets
         this.load.audio('snd_buoy', 'assets/audio/buoy.mp3');
@@ -47,10 +50,15 @@ export default class BootScene extends Phaser.Scene {
         this.load.audio('bgm', 'assets/audio/background.mp3');
         this.load.audio('snd_crash', 'assets/audio/crash.mp3');
         this.load.audio('snd_gameover', 'assets/audio/gameover.mp3');
-        this.load.audio('snd_hey', 'assets/audio/hey.mp3');
     }
 
     create() {
+        // Debug: confirm textures loaded
+        // eslint-disable-next-line no-console
+        console.log('Texture exists - branch:', this.textures.exists('branch'));
+        // eslint-disable-next-line no-console
+        console.log('Texture exists - geese:', this.textures.exists('geese'));
+
         this.scene.start('MenuScene');
     }
 
@@ -68,4 +76,6 @@ export default class BootScene extends Phaser.Scene {
         gfx.generateTexture(key, width, height);
         gfx.destroy();
     }
+
+
 } 
