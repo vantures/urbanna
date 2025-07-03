@@ -12,6 +12,7 @@ export default class BootScene extends Phaser.Scene {
         // this.createRectTexture('log2', 100, 20, 0x8b4513); // replaced by PNG
         this.createRectTexture('oysterCage', 60, 40, 0x4b4b4b);
         this.createRectTexture('jetSki', 80, 30, 0xff0000);
+        this.createRectTexture('wake', 4, 4, 0xffffff);
         // this.createRectTexture('oyster', 20, 20, 0xffffff);
         // this.createRectTexture('fireworks', 25, 25, 0xffff00);
         // this.createRectTexture('sunglasses', 30, 15, 0x000000);

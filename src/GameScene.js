@@ -62,6 +62,39 @@ export default class GameScene extends Phaser.Scene {
         this.player.setScale(PLAYER_SCALE);
         this.player.setCollideWorldBounds(true);
         this.player.clearTint();
+        this.player.setDepth(2); // ensure boat renders above wake
+
+        /* Wake particles (Phaser 3.60+ GameObject form) */
+        const wake = this.add.particles(0, 0, 'wake', {
+            speed: { min: -40, max: 40 },
+            angle: { min: 80, max: 100 },
+            lifespan: { min: 800, max: 1200 },   /* lasts longer */
+            quantity: 10,                        /* richer trail */
+            scale: { start: 1.2, end: 0 },
+            alpha: { start: 1, end: 0 },
+            frequency: 20,                      /* emit more often */
+            tint: 0xffffff,
+            blendMode: 'ADD'
+        });
+        wake.setDepth(1); // between water (0) and boat (2)
+        wake.startFollow(this.player, 0, this.player.displayHeight * 0.4);
+
+        /* Stern sheet wake – wider but lighter */
+        const sternZone = new Phaser.Geom.Rectangle(-this.player.displayWidth / 2, 0, this.player.displayWidth, 2);
+        const sternWake = this.add.particles(0, 0, 'wake', {
+            emitZone: { type: 'random', source: sternZone },
+            speed: { min: -15, max: 15 },
+            angle: 90,
+            lifespan: { min: 900, max: 1400 }, // longer trail
+            quantity: 3,
+            scale: { start: 0.8, end: 0 },
+            alpha: { start: 0.7, end: 0 },
+            frequency: 40,
+            tint: 0xffffff,
+            blendMode: 'ADD'
+        });
+        sternWake.setDepth(0.5);
+        sternWake.startFollow(this.player, 0, this.player.displayHeight * 0.35);
 
         // Collision body spans the entire visible boat sprite
         this.player.body.setSize(this.player.displayWidth, this.player.displayHeight, true);
@@ -242,6 +275,30 @@ export default class GameScene extends Phaser.Scene {
                 repeat: -1,
                 ease: 'Sine.easeInOut',
             });
+
+            /* Light horizontal wake for kayaker */
+            const kayakDirRight = sprite.body.velocity.x > 0;
+            const kayakZone = new Phaser.Geom.Rectangle(
+                kayakDirRight ? sprite.displayWidth * -0.5 : 0,
+                -2,
+                sprite.displayWidth * 0.5,
+                4
+            );
+            const kayakWake = this.add.particles(0, 0, 'wake', {
+                emitZone: { type: 'random', source: kayakZone },
+                speed: { min: 25, max: 50 },
+                angle: kayakDirRight ? 180 : 0, // emit opposite travel direction
+                lifespan: { min: 500, max: 900 },
+                quantity: 2,
+                frequency: 60,
+                scale: { start: 0.5, end: 0 },
+                alpha: { start: 0.5, end: 0 },
+                tint: 0xffffff,
+                blendMode: 'ADD',
+            });
+            kayakWake.setDepth(0.4);
+            // Follow sprite slightly above centre so wake trails behind horizontally
+            kayakWake.startFollow(sprite, kayakDirRight ? -sprite.displayWidth * 0.3 : sprite.displayWidth * 0.3, 0);
         } else if (key === 'geese') {
             // Match the kayaker pattern: spawn from left/right, horizontal drift, downward fall, and tilt bobbing
             const fromLeft = Phaser.Math.Between(0, 1) === 0;
@@ -273,6 +330,29 @@ export default class GameScene extends Phaser.Scene {
                 repeat: -1,
                 ease: 'Sine.easeInOut',
             });
+
+            /* Light horizontal wake for geese */
+            const geeseDirRight = sprite.body.velocity.x > 0;
+            const geeseZone = new Phaser.Geom.Rectangle(
+                geeseDirRight ? sprite.displayWidth * -0.5 : 0,
+                -2,
+                sprite.displayWidth * 0.5,
+                4
+            );
+            const geeseWake = this.add.particles(0, 0, 'wake', {
+                emitZone: { type: 'random', source: geeseZone },
+                speed: { min: 20, max: 35 },
+                angle: geeseDirRight ? 180 : 0,
+                lifespan: { min: 400, max: 800 },
+                quantity: 2,
+                frequency: 80,
+                scale: { start: 0.4, end: 0 },
+                alpha: { start: 0.4, end: 0 },
+                tint: 0xffffff,
+                blendMode: 'ADD',
+            });
+            geeseWake.setDepth(0.3);
+            geeseWake.startFollow(sprite, geeseDirRight ? -sprite.displayWidth * 0.3 : sprite.displayWidth * 0.3, 0);
         } else if (key === 'jetski') {
             // Spawn from top, left, or right (not bottom)
             const edge = Phaser.Utils.Array.GetRandom(['top', 'left', 'right']);
@@ -300,6 +380,25 @@ export default class GameScene extends Phaser.Scene {
             sprite.setAngularVelocity(Phaser.Math.Between(-540, 540));
 
             sprite.body.setSize(sprite.displayWidth, sprite.displayHeight);
+
+            /* Wake spray under jetski */
+            const zoneWidth = sprite.displayWidth * 1.1; // a bit wider than jetski
+            const jetZone = new Phaser.Geom.Rectangle(-zoneWidth / 2, 0, zoneWidth, 2);
+            const jetskiWake = this.add.particles(0, 0, 'wake', {
+                emitZone: { type: 'random', source: jetZone },
+                speed: { min: 60, max: 120 },
+                angle: 90, // downward
+                lifespan: { min: 500, max: 900 },
+                quantity: 4,             /* less dense */
+                frequency: 80,           /* emit less often */
+                scale: { start: 1.0, end: 0 },
+                alpha: { start: 0.8, end: 0 },
+                tint: 0xffffff,
+                blendMode: 'ADD',
+            });
+            jetskiWake.setDepth(0.5);
+            // Offset upward (-y) so wake originates behind moving jetski
+            jetskiWake.startFollow(sprite, 0, -sprite.displayHeight * 0.4);
         } else if (key === 'buoy') {
             sprite.setScale(BUOY_SCALE);
             // Rectangle body matching sprite size
@@ -338,6 +437,23 @@ export default class GameScene extends Phaser.Scene {
                 repeat: -1,
                 ease: 'Sine.easeInOut',
             });
+
+            /* Subtle wake for branch */
+            const branchZone = new Phaser.Geom.Rectangle(-sprite.displayWidth / 2, 0, sprite.displayWidth, 2);
+            const branchWake = this.add.particles(0, 0, 'wake', {
+                emitZone: { type: 'random', source: branchZone },
+                speed: { min: 10, max: 25 },
+                angle: 90,
+                lifespan: { min: 600, max: 1000 },
+                quantity: 1,
+                frequency: 120,
+                scale: { start: 0.5, end: 0 },
+                alpha: { start: 0.35, end: 0 },
+                tint: 0xffffff,
+                blendMode: 'ADD',
+            });
+            branchWake.setDepth(0.2);
+            branchWake.startFollow(sprite, 0, -sprite.displayHeight * 0.3);
         } else if (key === 'osprey_nest') {
             sprite.setScale(OSPREY_NEST_SCALE);
             // No horizontal drift; just falls straight like default
