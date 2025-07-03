@@ -32,13 +32,14 @@ export default class GameScene extends Phaser.Scene {
         this.invincibleText = null;
         this.invincibleTween = null;
         this.oysterCount = 0; // number of magic oysters collected
+        this.elapsedMs = 0;
     }
 
     create() {
         // Reset state
         this.score = 0;
         this.isGameOver = false;
-        this.startTimestamp = this.time.now; // used for speed scaling
+        this.elapsedMs = 0;
 
         // Reset invincibility state
         this.invincible = false;
@@ -90,8 +91,8 @@ export default class GameScene extends Phaser.Scene {
 
         // Touch input: follow pointer horizontally
         this.input.on('pointermove', (pointer) => {
-            // Smoothly lerp to pointer x position
-            this.player.x = Phaser.Math.Clamp(pointer.worldX, this.player.width / 2, this.scale.width - this.player.width / 2);
+            // Smoothly lerp to pointer x position, constrain fully across screen
+            this.player.x = Phaser.Math.Clamp(pointer.worldX, this.player.displayWidth / 2, this.scale.width - this.player.displayWidth / 2);
         });
 
         // Timers for spawning
@@ -103,8 +104,9 @@ export default class GameScene extends Phaser.Scene {
         // Scroll background to simulate movement
         this.water.tilePositionY += 0.5 * delta; // 0.5 px per ms ~ 480 px/s
 
-        // Increment score over time only if game is active
+        // Increment score & elapsed time when game is active
         if (!this.isGameOver) {
+            this.elapsedMs += delta;
             this.score += delta * 0.01; // 0.01 points per ms => 10 pts per second
             this.scoreText.setText('Score: ' + Math.floor(this.score));
         }
@@ -118,13 +120,8 @@ export default class GameScene extends Phaser.Scene {
             this.player.setVelocityX(0);
         }
 
-        if (this.cursors.up.isDown) {
-            this.player.setVelocityY(-PLAYER_SPEED * 0.6); // slight up movement
-        } else if (this.cursors.down.isDown) {
-            this.player.setVelocityY(PLAYER_SPEED * 0.6);
-        } else {
-            this.player.setVelocityY(0);
-        }
+        // Disable vertical movement – keep boat fixed on the Y axis
+        this.player.setVelocityY(0);
 
         // Destroy off-screen objects (after physics)
         this.obstacles.children.iterate((child) => {
@@ -166,7 +163,7 @@ export default class GameScene extends Phaser.Scene {
         const sprite = this.obstacles.create(xPos, yPos, key);
 
         // Compute current speed based on elapsed time
-        const elapsedSec = (this.time.now - this.startTimestamp) / 1000;
+        const elapsedSec = this.elapsedMs / 1000;
         const curSpeed = BASE_OBSTACLE_SPEED + elapsedSec * SPEED_GROWTH_PER_SEC;
 
         // Default downward motion
@@ -215,6 +212,16 @@ export default class GameScene extends Phaser.Scene {
             }
 
             sprite.body.setSize(sprite.displayWidth, sprite.displayHeight);
+
+            // Gentle vertical bobbing to mimic floating on water
+            this.tweens.add({
+                targets: sprite,
+                y: '+=4', // move down 4 px then back up
+                duration: Phaser.Math.Between(800, 1200),
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut',
+            });
         } else if (key === 'jetski') {
             // Spawn from top, left, or right (not bottom)
             const edge = Phaser.Utils.Array.GetRandom(['top', 'left', 'right']);
@@ -297,7 +304,7 @@ export default class GameScene extends Phaser.Scene {
         const key = Phaser.Utils.Array.GetRandom(powerupTypes);
         const xPos = Phaser.Math.Between(20, this.scale.width - 20);
         const sprite = this.powerups.create(xPos, -50, key);
-        const elapsedSec = (this.time.now - this.startTimestamp) / 1000;
+        const elapsedSec = this.elapsedMs / 1000;
         const curSpeed = BASE_OBSTACLE_SPEED + elapsedSec * SPEED_GROWTH_PER_SEC;
         sprite.setVelocityY(curSpeed);
         sprite.setData('type', key);

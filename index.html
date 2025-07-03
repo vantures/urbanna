@@ -3,23 +3,119 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rivah Dash</title>
+    <title>Rivah Race</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico" />
+
+    <!-- SEO & social sharing metadata -->
+    <meta name="description" content="Rivah Race – steer your boat down Virginia's Rappahannock River, collect magic oysters, and dodge obstacles in this fast-paced browser game." />
+    <meta name="keywords" content="Rivah Race, Rappahannock River game, browser game, powerboat, arcade" />
+    <meta property="og:title" content="Rivah Race" />
+    <meta property="og:description" content="Dash down the Rappahannock! Collect oysters, dodge hazards, and race to the Chesapeake Bay." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="assets/images/powerboat.png" />
     <!-- Phaser 3 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+    <!-- Google Font for stylish headings -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&display=swap" rel="stylesheet">
     <style>
         /* Ensure the canvas takes the full screen and removes default margins */
-        body {
+        html, body {
             margin: 0;
-            overflow: hidden;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            font-family: Arial, sans-serif;
+            overflow: hidden; /* prevent scrollbars */
         }
+
+        /* Unified river-blue gradient across the entire page */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg, #dfefff 0%, #9acfff 100%);
+            z-index: -3;
+        }
+
+        .sidebar {
+            width: 300px;
+            padding: 28px 32px;
+            box-sizing: border-box;
+            background: transparent; /* let body gradient show through */
+            color: #1a1a1a;
+            overflow-y: auto;
+            border-radius: 0;
+            box-shadow: none;
+            font-size: 18px;          /* larger base font */
+            line-height: 1.6;          /* relaxed spacing */
+        }
+
+        .sidebar h1,
+        .sidebar h2 {
+            font-family: 'Oswald', sans-serif;
+            color: #065fad;
+            margin-top: 0;
+            letter-spacing: 1px;
+        }
+
+        .sidebar h1 { font-size: 40px; margin-bottom: 16px; }
+        .sidebar h2 { font-size: 28px; margin-bottom: 12px; }
+
+        .sidebar ul {
+            padding-left: 20px;
+        }
+
+        .sidebar li {
+            margin-bottom: 12px;
+        }
+
         #game-container {
-            width: 100vw;
-            height: 100vh;
+            width: 480px;  /* Phaser base width */
+            height: 800px; /* Phaser base height */
+            flex-shrink: 0; /* keep aspect */
+            /* remove white border so gradient meets game area */
+            border: none;
+            border-radius: 0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="sidebar" id="left-panel">
+        <h1>Rivah Race</h1>
+        <p class="tagline" style="font-family: 'Oswald', sans-serif; font-size:22px; color:#003d7a; margin:4px 0 18px;">Navigate the river, collect oysters, dodge danger!</p>
+        <p>
+            Throttle up and dash down Virginia's
+            Rappahannock River, starting in the shadow of historic
+            Fredericksburg, sweeping past Tappahannock's old wharves,
+            skimming by the charming port of Urbanna, and finally roaring
+            into the open waters where the Rivah meets the Chesapeake Bay.
+            Grab shimmering magic oysters, weave through river traffic, and
+            see how far you can ride the current!
+        </p>
+    </div>
+
     <div id="game-container"></div>
+
+    <div class="sidebar" id="right-panel">
+        <h2>How to Play</h2>
+        <ul>
+            <li>Move left/right with the arrow keys or by dragging on touch.</li>
+            <li>Collect magic oysters for points &amp; temporary invincibility.</li>
+            <li>Avoid logs, buoys, kayakers, geese, jet-skis, and osprey nests.</li>
+            <li>The river speeds up the longer you survive. How far can you go?</li>
+        </ul>
+    </div>
 
     <!-- Game scripts -->
     <script type="module" src="src/main.js"></script>

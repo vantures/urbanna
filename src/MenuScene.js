@@ -10,17 +10,17 @@ export default class MenuScene extends Phaser.Scene {
         const { width, height } = this.scale;
 
         // Title text
-        this.add.text(width / 2, height / 2 - 100, 'Rivah Dash', {
-            fontFamily: 'Arial',
+        this.add.text(width / 2, height / 2 - 100, 'Rivah Race', {
+            fontFamily: 'Oswald',
             fontSize: '48px',
-            color: '#ffffff',
+            color: '#003d7a',
         }).setOrigin(0.5);
 
         // Instruction / start prompt
         const startText = this.add.text(width / 2, height / 2, 'Tap or Press SPACE to Start', {
-            fontFamily: 'Arial',
+            fontFamily: 'Oswald',
             fontSize: '24px',
-            color: '#ffffff',
+            color: '#065fad',
         }).setOrigin(0.5);
 
         // Start the game on pointer down or spacebar press
