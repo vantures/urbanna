@@ -33,6 +33,7 @@ export default class GameScene extends Phaser.Scene {
         this.invincibleTween = null;
         this.oysterCount = 0; // number of magic oysters collected
         this.elapsedMs = 0;
+        this.bgm = null; // background music instance
     }
 
     create() {
@@ -98,6 +99,13 @@ export default class GameScene extends Phaser.Scene {
         // Timers for spawning
         this.obstacleTimer = this.time.addEvent({ delay: SPAWN_INTERVAL, callback: this.spawnObstacle, callbackScope: this, loop: true });
         this.powerupTimer = this.time.addEvent({ delay: POWERUP_INTERVAL, callback: this.spawnPowerUp, callbackScope: this, loop: true });
+
+        // Start background music loop
+        if (this.bgm) {
+            this.bgm.stop();
+        }
+        this.bgm = this.sound.add('bgm', { volume: 0.4, loop: true });
+        this.bgm.play();
     }
 
     update(time, delta) {
@@ -155,12 +163,25 @@ export default class GameScene extends Phaser.Scene {
     }
 
     spawnObstacle() {
-        const obstacleTypes = ['log', 'buoy', 'kayaker', 'geese', 'jetski', 'osprey_nest'];
-        const key = Phaser.Utils.Array.GetRandom(obstacleTypes);
+        // Weighted obstacle selection – kayaker appears ~20% of spawns
+        const nonKayaker = ['log', 'buoy', 'geese', 'jetski', 'osprey_nest'];
+        const key = Phaser.Math.FloatBetween(0, 1) < 0.2 ? 'kayaker' : Phaser.Utils.Array.GetRandom(nonKayaker);
         let xPos = Phaser.Math.Between(40, this.scale.width - 40);
         let yPos = -50;
 
         const sprite = this.obstacles.create(xPos, yPos, key);
+
+        // Play spawn sound for corresponding obstacle
+        const spawnSounds = {
+            buoy: 'snd_buoy',
+            kayaker: 'snd_kayak',
+            geese: 'snd_geese',
+            jetski: 'snd_jetski',
+            osprey_nest: 'snd_osprey',
+        };
+        if (spawnSounds[key]) {
+            this.sound.play(spawnSounds[key], { volume: 0.5 });
+        }
 
         // Compute current speed based on elapsed time
         const elapsedSec = this.elapsedMs / 1000;
@@ -182,6 +203,8 @@ export default class GameScene extends Phaser.Scene {
             } else {
                 sprite.setFlipX(false);
             }
+            // No additional voice; spawnSounds already played 'snd_kayak'
+
             // Update body size to match scaling
             sprite.body.setSize(sprite.displayWidth, sprite.displayHeight);
 
@@ -365,6 +388,10 @@ export default class GameScene extends Phaser.Scene {
                     onComplete: () => popup.destroy(),
                 });
 
+                // Play collection & invincibility sounds
+                this.sound.play('snd_oyster', { volume: 0.6 });
+                this.sound.play('snd_invincible', { volume: 0.6 });
+
                 this.activateInvincibility();
                 break;
         }
@@ -377,6 +404,14 @@ export default class GameScene extends Phaser.Scene {
         }
         if (this.isGameOver) return;
         this.isGameOver = true;
+
+        // Stop background music and play crash/game over sounds
+        if (this.bgm) {
+            this.bgm.stop();
+            this.bgm = null;
+        }
+        this.sound.play('snd_crash', { volume: 0.8 });
+        this.sound.play('snd_gameover', { volume: 0.7, delay: 0.3 });
 
         // Stop physics and timers
         this.physics.pause();
@@ -425,7 +460,7 @@ export default class GameScene extends Phaser.Scene {
         if (this.invincibleText) {
             this.invincibleText.destroy();
         }
-        this.invincibleText = this.add.text(this.scale.width / 2, 10, '5', {
+        this.invincibleText = this.add.text(this.scale.width / 2, 50, '5', {
             fontFamily: 'Arial',
             fontSize: '32px',
             color: '#ffffff',

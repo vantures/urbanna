@@ -9,15 +9,11 @@ export default class MenuScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
 
-        // Title text
-        this.add.text(width / 2, height / 2 - 100, 'Rivah Race', {
-            fontFamily: 'Oswald',
-            fontSize: '48px',
-            color: '#003d7a',
-        }).setOrigin(0.5);
+        // Title logo
+        this.add.image(width / 2, height / 2 - 100, 'logo').setOrigin(0.5).setScale(0.8);
 
         // Instruction / start prompt
-        const startText = this.add.text(width / 2, height / 2, 'Tap or Press SPACE to Start', {
+        const startText = this.add.text(width / 2, height / 2 + 60, 'Tap or Press SPACE to Start', {
             fontFamily: 'Oswald',
             fontSize: '24px',
             color: '#065fad',

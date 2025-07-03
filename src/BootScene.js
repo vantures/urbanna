@@ -34,6 +34,20 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('jetski', 'assets/images/jetski.png');
         this.load.image('magic_oyster', 'assets/images/magic_oyster.png');
         this.load.image('osprey_nest', 'assets/images/osprey_nest.png');
+        this.load.image('logo', 'assets/images/rivahracelogo.png');
+
+        // Audio assets
+        this.load.audio('snd_buoy', 'assets/audio/buoy.mp3');
+        this.load.audio('snd_geese', 'assets/audio/geese.mp3');
+        this.load.audio('snd_kayak', 'assets/audio/kayak.mp3');
+        this.load.audio('snd_jetski', 'assets/audio/jetski.mp3');
+        this.load.audio('snd_osprey', 'assets/audio/osprey.mp3');
+        this.load.audio('snd_oyster', 'assets/audio/oyster.mp3');
+        this.load.audio('snd_invincible', 'assets/audio/invincible.mp3');
+        this.load.audio('bgm', 'assets/audio/background.mp3');
+        this.load.audio('snd_crash', 'assets/audio/crash.mp3');
+        this.load.audio('snd_gameover', 'assets/audio/gameover.mp3');
+        this.load.audio('snd_hey', 'assets/audio/hey.mp3');
     }
 
     create() {
