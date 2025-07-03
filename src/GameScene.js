@@ -34,6 +34,7 @@ export default class GameScene extends Phaser.Scene {
         this.oysterCount = 0; // number of magic oysters collected
         this.elapsedMs = 0;
         this.bgm = null; // background music instance
+        this.prevPlayerX = 0; // Added for tilt calculation
     }
 
     create() {
@@ -131,17 +132,26 @@ export default class GameScene extends Phaser.Scene {
         // Disable vertical movement – keep boat fixed on the Y axis
         this.player.setVelocityY(0);
 
-        /* ----- Boat tilt based on horizontal velocity ----- */
+        /* ----- Boat tilt based on horizontal motion (keyboard & touch) ----- */
         const velX = this.player.body.velocity.x;
+
+        // Fallback to positional delta when velocity is near-zero (touch dragging sets x directly)
+        const posDeltaX = this.player.x - (this.prevPlayerX || this.player.x);
+        const effectiveX = Math.abs(velX) > 20 ? velX : posDeltaX * 60; // posDeltaX per frame → rough px/s
+
         let targetAngle = 0;
-        if (velX < -20) {
+        if (effectiveX < -20) {
             targetAngle = -8; // tilt left
-        } else if (velX > 20) {
+        } else if (effectiveX > 20) {
             targetAngle = 8;  // tilt right
         }
-        // Smoothly interpolate current angle toward targetAngle
+
+        // Smoothly interpolate current angle toward the target
         this.player.angle = Phaser.Math.Linear(this.player.angle, targetAngle, 0.15);
-        /* ----------------------------------------------- */
+
+        // Remember position for next frame
+        this.prevPlayerX = this.player.x;
+        /* ----------------------------------------------------------------- */
 
         // Destroy off-screen objects (after physics)
         this.obstacles.children.iterate((child) => {
