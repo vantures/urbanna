@@ -22,8 +22,8 @@ export default class BootScene extends Phaser.Scene {
 
 
 
-        // Simple blue water tile for scrolling background
-        this.createRectTexture('water', 64, 64, 0x1e90ff);
+        // Procedural water texture (64x64) with wave stripes
+        this.createWaterTexture('water', 64, 64);
 
         // Placeholder texture for the bridge goal
         this.createRectTexture('bridge', 240, 40, 0xaaaaaa);
@@ -78,5 +78,48 @@ export default class BootScene extends Phaser.Scene {
         gfx.destroy();
     }
 
+    /**
+     * Generates a repeating water texture with subtle wave stripes.
+     */
+    createWaterTexture(key, w, h) {
+        const gfx = this.add.graphics();
+        const base = 0x1979d4;      // deeper blue
+        const lighter = 0x2a8aed;   // slight tint
+        const darker = 0x1268c0;
+
+        // solid base colour
+        gfx.fillStyle(base, 1);
+        gfx.fillRect(0, 0, w, h);
+
+        // subtle broad gradient stripes – very low alpha
+        const stripeHeight = 8;
+        for (let y = 0; y < h; y += stripeHeight) {
+            const col = y % (stripeHeight * 2) === 0 ? lighter : darker;
+            gfx.fillStyle(col, 0.04); // very faint
+            gfx.fillRect(0, y, w, stripeHeight);
+        }
+
+        // scatter small transparent dots to break repetition
+        for (let i = 0; i < 120; i++) {
+            const rx = Phaser.Math.Between(0, w);
+            const ry = Phaser.Math.Between(0, h);
+            const size = Phaser.Math.Between(2, 4);
+            gfx.fillStyle(0xffffff, 0.03);
+            gfx.fillRect(rx, ry, size, size);
+        }
+
+        // few curved ripple arcs
+        gfx.lineStyle(1, 0xffffff, 0.05);
+        for (let i = 0; i < 4; i++) {
+            const cx = Phaser.Math.Between(0, w);
+            const cy = Phaser.Math.Between(0, h);
+            gfx.beginPath();
+            gfx.arc(cx, cy, Phaser.Math.Between(8, 14), 0, Math.PI * 2);
+            gfx.strokePath();
+        }
+
+        gfx.generateTexture(key, w, h);
+        gfx.destroy();
+    }
 
 } 

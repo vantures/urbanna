@@ -21,6 +21,7 @@ const INVINCIBILITY_DURATION = 5000; // ms of invulnerability granted by magic o
 const OSPREY_NEST_SCALE = 0.5; // scale for osprey nest pole obstacle5
 const WAKE_FREQ = 70;
 const BRANCH_SCALE = 1.0; // scale for branch obstacle
+const WATER_SCROLL_FACTOR = 0.25; // portion of obstacle speed applied to background
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -143,8 +144,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
-        // Scroll background to simulate movement
-        this.water.tilePositionY += 0.5 * delta; // 0.5 px per ms ~ 480 px/s
+        // Scroll water based on current obstacle speed
+        const currentSpeed = BASE_OBSTACLE_SPEED + (this.elapsedMs / 1000) * SPEED_GROWTH_PER_SEC;
+        const scrollPerMs = currentSpeed * WATER_SCROLL_FACTOR / 1000;
+        this.water.tilePositionY -= scrollPerMs * delta; // upward scrolling relative to boat movement
 
         // Increment score & elapsed time when game is active
         if (!this.isGameOver) {
