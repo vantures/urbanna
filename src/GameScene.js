@@ -22,6 +22,7 @@ const OSPREY_NEST_SCALE = 0.5; // scale for osprey nest pole obstacle5
 const WAKE_FREQ = 70;
 const BRANCH_SCALE = 1.0; // scale for branch obstacle
 const WATER_SCROLL_FACTOR = 0.25; // portion of obstacle speed applied to background
+const SAILBOAT_SCALE = 0.7; // sailboat appears larger
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -58,9 +59,17 @@ export default class GameScene extends Phaser.Scene {
         // Simple water background (no perspective tint)
         this.water = this.add.tileSprite(0, 0, this.scale.width, this.scale.height, 'water').setOrigin(0);
 
+        // Determine selected boat key from registry
+        let boatKey = this.registry.get('boatKey') || 'player';
+        if (!this.textures.exists(boatKey)) {
+            boatKey = 'player'; // fallback if texture missing
+        }
+
         // Player setup
-        this.player = this.physics.add.sprite(this.scale.width / 2, this.scale.height - 80, 'player');
-        this.player.setScale(PLAYER_SCALE);
+        this.player = this.physics.add.sprite(this.scale.width / 2, this.scale.height - 80, boatKey);
+
+        const scaleToApply = boatKey === 'sailboat' ? SAILBOAT_SCALE : PLAYER_SCALE;
+        this.player.setScale(scaleToApply);
         this.player.setCollideWorldBounds(true);
         this.player.clearTint();
         this.player.setDepth(2); // ensure boat renders above wake
@@ -135,11 +144,15 @@ export default class GameScene extends Phaser.Scene {
         this.obstacleTimer = this.time.addEvent({ delay: SPAWN_INTERVAL, callback: this.spawnObstacle, callbackScope: this, loop: true });
         this.powerupTimer = this.time.addEvent({ delay: POWERUP_INTERVAL, callback: this.spawnPowerUp, callbackScope: this, loop: true });
 
-        // Start background music loop
+        // Choose background music per boat
+        let bgmKey = 'bgm';
+        if (boatKey === 'sailboat' && this.cache.audio.exists('bgm_sail')) {
+            bgmKey = 'bgm_sail';
+        }
         if (this.bgm) {
             this.bgm.stop();
         }
-        this.bgm = this.sound.add('bgm', { volume: 0.4, loop: true });
+        this.bgm = this.sound.add(bgmKey, { volume: 0.4, loop: true });
         this.bgm.play();
     }
 

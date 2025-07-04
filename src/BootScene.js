@@ -39,6 +39,7 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('osprey_nest', 'assets/images/osprey_nest.png');
         this.load.image('logo', 'assets/images/rivahracelogo.png');
         this.load.image('branch', 'assets/images/branch.png');
+        this.load.image('sailboat', 'assets/images/sailboat.png');
 
         // Audio assets
         this.load.audio('snd_buoy', 'assets/audio/buoy.mp3');
@@ -49,6 +50,7 @@ export default class BootScene extends Phaser.Scene {
         this.load.audio('snd_oyster', 'assets/audio/oyster.mp3');
         this.load.audio('snd_invincible', 'assets/audio/invincible.mp3');
         this.load.audio('bgm', 'assets/audio/background.mp3');
+        this.load.audio('bgm_sail', 'assets/audio/background_sailboat.mp3');
         this.load.audio('snd_crash', 'assets/audio/crash.mp3');
         this.load.audio('snd_gameover', 'assets/audio/gameover.mp3');
     }
@@ -59,6 +61,8 @@ export default class BootScene extends Phaser.Scene {
         console.log('Texture exists - branch:', this.textures.exists('branch'));
         // eslint-disable-next-line no-console
         console.log('Texture exists - geese:', this.textures.exists('geese'));
+        // eslint-disable-next-line no-console
+        console.log('Texture exists - sailboat:', this.textures.exists('sailboat'));
 
         this.scene.start('MenuScene');
     }
