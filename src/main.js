@@ -3,6 +3,7 @@
 
 import BootScene from './BootScene.js';
 import MenuScene from './MenuScene.js';
+import AboutScene from './AboutScene.js';
 import GameScene from './GameScene.js';
 
 const WIDTH = 480; // Base resolution width
@@ -25,7 +26,7 @@ const config = {
             debug: false,
         },
     },
-    scene: [BootScene, MenuScene, GameScene],
+    scene: [BootScene, MenuScene, AboutScene, GameScene],
 };
 
 // Initialise the game when the page finishes loading.

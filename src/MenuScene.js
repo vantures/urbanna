@@ -14,7 +14,7 @@ export default class MenuScene extends Phaser.Scene {
         this.add.image(width / 2, height / 2 - 160, 'logo').setOrigin(0.5).setScale(0.8);
 
         // Boat selector thumbnails
-        const powerThumb = this.add.image(width / 2 - 60, height / 2 + 40, 'player').setScale(0.25).setInteractive({ useHandCursor: true });
+        const powerThumb = this.add.image(width / 2 - 60, height / 2 + 40, 'player').setScale(0.40).setInteractive({ useHandCursor: true });
         const sailThumb  = this.add.image(width / 2 + 60, height / 2 + 40, 'sailboat').setScale(0.45).setInteractive({ useHandCursor: true });
 
         const highlight = this.add.rectangle(0,0, 10, 10)
@@ -49,6 +49,24 @@ export default class MenuScene extends Phaser.Scene {
         // Start the game on pointer down or spacebar press
         this.input.once('pointerdown', this.startGame, this);
         this.input.keyboard.once('keydown-SPACE', this.startGame, this);
+
+        // Subtle "About" link at the bottom
+        const aboutLink = this.add.text(width / 2, height - 24, 'About', {
+            fontFamily: 'Oswald',
+            fontSize: '18px',
+            color: '#065fad',
+            fontStyle: 'italic'
+        }).setOrigin(0.5)
+          .setInteractive({ useHandCursor: true });
+
+        aboutLink.on('pointerdown', (pointer) => {
+            // Prevent unintended startGame trigger
+            if (pointer && pointer.event && pointer.event.stopPropagation) {
+                pointer.event.stopPropagation();
+            }
+            this.input.off('pointerdown', this.startGame, this);
+            this.scene.start('AboutScene');
+        });
     }
 
     startGame() {

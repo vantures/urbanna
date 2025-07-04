@@ -6,7 +6,7 @@ const SPAWN_INTERVAL = 1200; // ms between obstacle spawns
 const POWERUP_INTERVAL = 8000; // ms between magic oyster spawns (rarer)
 
 // Top-down mode: constant scales
-const PLAYER_SCALE = 0.4;
+const PLAYER_SCALE = 0.6;
 const BUOY_SCALE   = 0.45; // 5x smaller than before
 const KAYAKER_SCALE = 0.4 ; // very small kayaker
 const OBSTACLE_SCALE = 1.0;
@@ -87,7 +87,7 @@ export default class GameScene extends Phaser.Scene {
             blendMode: 'ADD'
         });
         wake.setDepth(1); // between water (0) and boat (2)
-        wake.startFollow(this.player, 0, this.player.displayHeight * 0.4);
+        wake.startFollow(this.player, 0, this.player.displayHeight * 0.45);
 
         /* Stern sheet wake – wider but lighter */
         const sternZone = new Phaser.Geom.Rectangle(-this.player.displayWidth / 2, 0, this.player.displayWidth, 2);
@@ -104,7 +104,7 @@ export default class GameScene extends Phaser.Scene {
             blendMode: 'ADD'
         });
         sternWake.setDepth(0.5);
-        sternWake.startFollow(this.player, 0, this.player.displayHeight * 0.35);
+        sternWake.startFollow(this.player, 0, this.player.displayHeight * 0.4);
 
         // Collision body spans the entire visible boat sprite
         this.player.body.setSize(this.player.displayWidth, this.player.displayHeight, true);
