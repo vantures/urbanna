@@ -22,7 +22,7 @@ const OSPREY_NEST_SCALE = 0.5; // scale for osprey nest pole obstacle5
 const WAKE_FREQ = 70;
 const BRANCH_SCALE = 1.0; // scale for branch obstacle
 const WATER_SCROLL_FACTOR = 0.25; // portion of obstacle speed applied to background
-const SAILBOAT_SCALE = 0.7; // sailboat appears larger
+const SAILBOAT_SCALE = 0.6; // sailboat appears larger
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -245,12 +245,17 @@ export default class GameScene extends Phaser.Scene {
         // Play spawn sound for corresponding obstacle
         const spawnSounds = {
             buoy: 'snd_buoy',
-            kayaker: 'snd_kayak',
             geese: 'snd_geese',
             jetski: 'snd_jetski',
             osprey_nest: 'snd_osprey',
         };
-        if (spawnSounds[key]) {
+
+        if (key === 'kayaker') {
+            // delay kayak splash sound by 500ms
+            this.time.delayedCall(900, () => {
+                this.sound.play('snd_kayak', { volume: 0.3 });
+            });
+        } else if (spawnSounds[key]) {
             this.sound.play(spawnSounds[key], { volume: 0.5 });
         }
 
