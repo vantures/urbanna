@@ -41,7 +41,7 @@ export default class AboutScene extends Phaser.Scene {
         }
 
         // --- Descriptive text ---
-        const aboutText = `This game was a father-son project giving my 7-year-old son, Henry, hands-on experience with coding and AI tools. He helped brainstorm ideas, tweak the gameplay, create images and sound effects, and even wrote bits of code alongside me.\n\nThe inspiration came from our visits to Urbanna, VA, where Henry loves spending time with his Pop and Didi, riding around on the boat, catching crabs, and harvesting oysters. We wanted to capture a bit of that adventure and turn it into something fun and chaotic that others could enjoy too.\n\nHope you enjoy playing it as much as we enjoyed making it!\n\nQuestions, comments, or bugs to report?`;
+        const aboutText = `This game was a father-son project that gave my 7-year-old son, Henry, hands-on experience with coding and AI tools. He helped brainstorm ideas, tweak the gameplay, create images and sound effects, and even wrote bits of code alongside me.\n\nThe inspiration came from our visits to Urbanna, VA, where Henry loves spending time with his Pop and Didi, riding around on the boat, catching crabs, and harvesting oysters. We wanted to capture a bit of that adventure and turn it into something fun and chaotic that others could enjoy too.\n\nHope you enjoy playing it as much as we enjoyed making it!\n\nQuestions, comments, or bugs to report?`;
 
         const bodyText = this.add.text(width / 2, yPos, aboutText, {
             fontFamily: 'Arial',
