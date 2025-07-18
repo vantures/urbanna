@@ -7,6 +7,69 @@ export default class BootScene extends Phaser.Scene {
     }
 
     preload() {
+        // Create loading bar
+        const progressBar = this.add.graphics();
+        const progressBox = this.add.graphics();
+        progressBox.fillStyle(0x222222, 0.8);
+        progressBox.fillRect(240, 270, 320, 50);
+
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        const loadingText = this.make.text({
+            x: width / 2,
+            y: height / 2 - 50,
+            text: 'Loading...',
+            style: {
+                font: '20px monospace',
+                fill: '#ffffff'
+            }
+        });
+        loadingText.setOrigin(0.5, 0.5);
+
+        const percentText = this.make.text({
+            x: width / 2,
+            y: height / 2 - 5,
+            text: '0%',
+            style: {
+                font: '18px monospace',
+                fill: '#ffffff'
+            }
+        });
+        percentText.setOrigin(0.5, 0.5);
+
+        const assetText = this.make.text({
+            x: width / 2,
+            y: height / 2 + 50,
+            text: '',
+            style: {
+                font: '14px monospace',
+                fill: '#ffffff'
+            }
+        });
+        assetText.setOrigin(0.5, 0.5);
+
+        // Update progress bar
+        this.load.on('progress', function (value) {
+            progressBar.clear();
+            progressBar.fillStyle(0xffffff, 1);
+            progressBar.fillRect(250, 280, 300 * value, 30);
+            percentText.setText(parseInt(value * 100) + '%');
+        });
+
+        this.load.on('fileprogress', function (file) {
+            assetText.setText('Loading asset: ' + file.key);
+        });
+
+        this.load.on('complete', () => {
+            progressBar.destroy();
+            progressBox.destroy();
+            loadingText.destroy();
+            percentText.destroy();
+            assetText.destroy();
+            // Start menu scene after all assets are loaded
+            this.scene.start('MenuScene');
+        });
+
         // Create placeholder textures via graphics.
         // this.createRectTexture('player', 40, 40, 0x00ff00); // removed to avoid key conflict; player will use PNG
         // this.createRectTexture('log2', 100, 20, 0x8b4513); // replaced by PNG
@@ -40,6 +103,8 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('logo', 'assets/images/rivahracelogo.png');
         this.load.image('branch', 'assets/images/branch.png');
         this.load.image('sailboat', 'assets/images/sailboat.png');
+        // Preload About page photo so it's ready when AboutScene first opens
+        this.load.image('about_photo', 'assets/images/about_photo.png');
 
         // Audio assets
         this.load.audio('snd_buoy', 'assets/audio/buoy.mp3');
@@ -50,7 +115,8 @@ export default class BootScene extends Phaser.Scene {
         this.load.audio('snd_oyster', 'assets/audio/oyster.mp3');
         this.load.audio('snd_invincible', 'assets/audio/invincible.mp3');
         this.load.audio('bgm', 'assets/audio/background.mp3');
-        this.load.audio('bgm_sail', 'assets/audio/background_sailboat.mp3');
+        // Correct filename for sailboat background music
+        this.load.audio('bgm_sail', 'assets/audio/background_sailing.mp3');
         this.load.audio('snd_crash', 'assets/audio/crash.mp3');
         this.load.audio('snd_gameover', 'assets/audio/gameover.mp3');
     }
@@ -64,7 +130,7 @@ export default class BootScene extends Phaser.Scene {
         // eslint-disable-next-line no-console
         console.log('Texture exists - sailboat:', this.textures.exists('sailboat'));
 
-        this.scene.start('MenuScene');
+        // Scene start is now handled in the load.complete callback
     }
 
     /**

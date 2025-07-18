@@ -6,7 +6,7 @@ export default class AboutScene extends Phaser.Scene {
     preload() {
         // Load photo once (ensure it only loads if not already in cache).
         if (!this.textures.exists('about_photo')) {
-            this.load.image('about_photo', 'assets/images/about_photo.png'); // Replace with actual image path/format
+            this.load.image('about_photo', 'assets/images/about_photo.png');
         }
     }
 
