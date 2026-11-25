@@ -1,3 +1,5 @@
+import { recordScore } from './HighScores.js';
+
 // src/GameScene.js
 // Main gameplay scene for Rivah Dash.
 
@@ -66,6 +68,7 @@ export default class GameScene extends Phaser.Scene {
         }
 
         // Player setup
+        this.activeBoatKey = boatKey;
         this.player = this.physics.add.sprite(this.scale.width / 2, this.scale.height - 80, boatKey);
 
         const scaleToApply = boatKey === 'sailboat' ? SAILBOAT_SCALE : PLAYER_SCALE;
@@ -593,6 +596,9 @@ export default class GameScene extends Phaser.Scene {
         // Highlight collision
         player.setTint(0xff0000);
 
+        const finalScore = Math.floor(this.score);
+        const { best, isRecord } = recordScore(this.activeBoatKey, finalScore);
+
         // Display final score message & prompt
         this.add.text(this.scale.width / 2, this.scale.height / 2 - 40, `Game Over`, {
             fontFamily: 'Arial',
@@ -601,14 +607,23 @@ export default class GameScene extends Phaser.Scene {
             align: 'center',
         }).setOrigin(0.5);
 
-        this.add.text(this.scale.width / 2, this.scale.height / 2 + 10, `Score: ${Math.floor(this.score)}`, {
+        this.add.text(this.scale.width / 2, this.scale.height / 2 + 10, `Score: ${finalScore.toLocaleString()}`, {
             fontFamily: 'Arial',
             fontSize: '32px',
             color: '#ffff00',
             align: 'center',
         }).setOrigin(0.5);
 
-        const promptText = this.add.text(this.scale.width / 2, this.scale.height / 2 + 60, 'Press SPACE or Tap to return', {
+        const bestLabel = isRecord ? 'New personal best' : 'Personal best';
+        this.add.text(this.scale.width / 2, this.scale.height / 2 + 48, `${bestLabel}: ${best.toLocaleString()}`, {
+            fontFamily: 'Arial',
+            fontSize: '24px',
+            color: '#ffffff',
+            stroke: '#00345a',
+            strokeThickness: 4,
+        }).setOrigin(0.5);
+
+        this.add.text(this.scale.width / 2, this.scale.height / 2 + 90, 'Press SPACE or Tap to return', {
             fontFamily: 'Arial',
             fontSize: '20px',
             color: '#ffffff',

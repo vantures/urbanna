@@ -1,3 +1,5 @@
+import { getBestScore } from './HighScores.js';
+
 // src/MenuScene.js
 // Displays the main menu with a start button and boat selector.
 
@@ -45,6 +47,18 @@ export default class MenuScene extends Phaser.Scene {
             fontSize: '22px',
             color: '#065fad',
         }).setOrigin(0.5);
+
+        this.add.text(width / 2, height / 2 + 185, [
+            'Personal Bests',
+            `Powerboat  ${getBestScore('player').toLocaleString()}`,
+            `Sailboat  ${getBestScore('sailboat').toLocaleString()}`,
+        ], {
+            fontFamily: 'Oswald',
+            fontSize: '22px',
+            color: '#065fad',
+            align: 'center',
+            lineSpacing: 5,
+        }).setOrigin(0.5, 0);
 
         // Start the game on pointer down or spacebar press
         this.input.once('pointerdown', this.startGame, this);
